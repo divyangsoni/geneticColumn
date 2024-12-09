@@ -2,8 +2,8 @@ use csv::{ReaderBuilder, WriterBuilder};
 use rand::{prelude::*, seq::SliceRandom};
 use std::error::Error;
 use std::collections::HashSet;
+use std::io::{self, Write};
 
-// Structures to hold input data
 #[derive(Debug, Clone)]
 struct ColumnData {
     label: String,
@@ -18,17 +18,13 @@ struct SectionData {
     weight_per_unit_length: f64,
 }
 
-// Genetic Algorithm Parameters (modified for better convergence)
-const POPULATION_SIZE: usize = 300;      // Increased population for better exploration
-const NUM_GENERATIONS: usize = 2000;    // Increased generations to allow for more cycles
-const MUTATION_RATE: f64 = 0.02;         // Lower mutation rate for better convergence
-const TOURNAMENT_SIZE: usize = 5;        // Tournament size for better selection
-const ELITISM_RATE: usize = 5;           // Retain top 5 solutions (elitism)
-const CAPACITY_PENALTY_FACTOR: f64 = 1000.0; // Penalty factor for axial capacity violations
+const POPULATION_SIZE: usize = 300;
+const NUM_GENERATIONS: usize = 2000;
+const MUTATION_RATE: f64 = 0.02;
+const TOURNAMENT_SIZE: usize = 5;
+const ELITISM_RATE: usize = 5; // Elitism rate, retain top 5 solutions
+const CAPACITY_PENALTY_FACTOR: f64 = 1000.0;
 
-// ------------------ Helper Functions ------------------
-
-/// Reads project data (columns) from a CSV file
 fn load_project_data(filename: &str) -> Result<Vec<ColumnData>, Box<dyn Error>> {
     let mut rdr = ReaderBuilder::new().has_headers(true).from_path(filename)?;
     let mut data = Vec::new();
@@ -47,7 +43,6 @@ fn load_project_data(filename: &str) -> Result<Vec<ColumnData>, Box<dyn Error>> 
     Ok(data)
 }
 
-/// Reads section data from a CSV file
 fn load_section_data(filename: &str) -> Result<Vec<SectionData>, Box<dyn Error>> {
     let mut rdr = ReaderBuilder::new().has_headers(true).from_path(filename)?;
     let mut data = Vec::new();
@@ -66,7 +61,6 @@ fn load_section_data(filename: &str) -> Result<Vec<SectionData>, Box<dyn Error>>
     Ok(data)
 }
 
-/// Initializes the population
 fn initialize_population(
     project_data: &[ColumnData],
     sections: &[SectionData],
@@ -78,35 +72,27 @@ fn initialize_population(
         let chromosome = project_data
             .iter()
             .map(|column| {
-                // Find valid sections where axial capacity satisfies column load
                 let valid_sections: Vec<usize> = sections
                     .iter()
                     .enumerate()
                     .filter(|(_, section)| column.max_axial_load <= section.axial_capacity)
-                    .map(|(index, _)| index) // Extract the index (usize)
+                    .map(|(index, _)| index)
                     .collect();
 
-                // If no valid sections exist (should not happen if data is valid)
-                if valid_sections.is_empty() {
-                    panic!("No valid sections found for column {:?}", column);
-                }
-
-                // Randomly choose a valid section index
                 *valid_sections.choose(&mut rng).expect("No valid sections found")
             })
-            .collect(); // Collect valid indices into the chromosome
+            .collect();
 
         population.push(chromosome);
     }
     population
 }
 
-/// Fitness function: Calculates total weight, penalizing invalid solutions
 fn fitness(
     chromosome: &[usize],
     project_data: &[ColumnData],
     sections: &[SectionData],
-    allowed_types: usize,
+    distinct_section_types: usize,
 ) -> f64 {
     let mut used_types = HashSet::new();
     let mut total_weight = 0.0;
@@ -118,22 +104,22 @@ fn fitness(
 
         // Check if the section can support the column load
         if column.max_axial_load > section.axial_capacity {
-            penalty += (column.max_axial_load - section.axial_capacity) * CAPACITY_PENALTY_FACTOR; // Hard penalty for capacity violations
+            penalty += (column.max_axial_load - section.axial_capacity) * CAPACITY_PENALTY_FACTOR;
         }
 
         total_weight += section.weight_per_unit_length * column.length;
         used_types.insert(section_index);
     }
 
-    // Penalize solutions exceeding allowed distinct types
-    if used_types.len() > allowed_types {
-        penalty += (used_types.len() - allowed_types) as f64 * 100.0; // Penalize for exceeding allowed types
+    // Penalize if the chromosome doesn't meet the required number of distinct section types
+    let distinct_count = used_types.len();
+    if distinct_count != distinct_section_types {
+        penalty += (distinct_section_types as f64 - distinct_count as f64).abs() * 1000.0;
     }
 
     total_weight + penalty
 }
 
-/// Tournament selection
 fn tournament_selection(
     population: &[Vec<usize>],
     fitness_values: &[f64],
@@ -150,7 +136,6 @@ fn tournament_selection(
     population[tournament[0].0].clone()
 }
 
-/// Crossover: Single-point crossover
 fn crossover(parent1: &[usize], parent2: &[usize]) -> (Vec<usize>, Vec<usize>) {
     let mut rng = thread_rng();
     let point = rng.gen_range(1..parent1.len());
@@ -161,7 +146,6 @@ fn crossover(parent1: &[usize], parent2: &[usize]) -> (Vec<usize>, Vec<usize>) {
     (child1, child2)
 }
 
-/// Mutation
 fn mutate(chromosome: &mut Vec<usize>, section_indices: &[usize]) {
     let mut rng = thread_rng();
     for gene in chromosome.iter_mut() {
@@ -171,12 +155,10 @@ fn mutate(chromosome: &mut Vec<usize>, section_indices: &[usize]) {
     }
 }
 
-// ------------------ Genetic Algorithm ------------------
-
 fn genetic_algorithm(
     project_data: &[ColumnData],
     sections: &[SectionData],
-    allowed_types: usize,
+    distinct_section_types: usize,
 ) -> Vec<usize> {
     let section_indices: Vec<usize> = (0..sections.len()).collect();
     let mut population = initialize_population(project_data, &sections);
@@ -186,10 +168,9 @@ fn genetic_algorithm(
     for generation in 1..=NUM_GENERATIONS {
         let fitness_values: Vec<f64> = population
             .iter()
-            .map(|chromosome| fitness(chromosome, project_data, sections, allowed_types))
+            .map(|chromosome| fitness(chromosome, project_data, sections, distinct_section_types))
             .collect();
 
-        // Find the best solution in this generation
         let (gen_best_idx, &gen_best_fitness) = fitness_values
             .iter()
             .enumerate()
@@ -201,11 +182,15 @@ fn genetic_algorithm(
             best_solution = population[gen_best_idx].clone();
         }
 
-        // Implement elitism: carry forward the best solutions
         let mut new_population = Vec::new();
-        new_population.push(best_solution.clone()); // Elitism: Keep the best solution
 
-        while new_population.len() < POPULATION_SIZE - ELITISM_RATE {
+        // Elitism: Keep the top ELITISM_RATE solutions
+        for _ in 0..ELITISM_RATE {
+            new_population.push(population[fitness_values.iter().position(|&x| x == best_fitness).unwrap()].clone());
+        }
+
+        // Fill the remaining population
+        while new_population.len() < POPULATION_SIZE {
             let parent1 = tournament_selection(&population, &fitness_values);
             let parent2 = tournament_selection(&population, &fitness_values);
             let (mut child1, mut child2) = crossover(&parent1, &parent2);
@@ -215,31 +200,30 @@ fn genetic_algorithm(
             new_population.push(child2);
         }
 
-        // Add elite individuals to the population
-        for _ in 0..ELITISM_RATE {
-            new_population.push(best_solution.clone());
-        }
+        new_population.truncate(POPULATION_SIZE); // Ensure the population size is exactly POPULATION_SIZE
 
         population = new_population;
-        println!("Generation {}: Best Fitness = {:.2}", generation, best_fitness);
+
+        // Print generation number and fitness/weight of the best solution
+        let total_weight = fitness(&best_solution, project_data, sections, distinct_section_types);
+        println!("Generation {}: Best Fitness (Weight) = {:.2}", generation, total_weight);
     }
 
     best_solution
 }
 
-// ------------------ Main ------------------
-
 fn main() -> Result<(), Box<dyn Error>> {
     let project_data = load_project_data("project_data.csv")?;
     let sections = load_section_data("column_sections.csv")?;
 
-    // Prompt user for allowed number of distinct column sections
-    println!("Enter the number of distinct column sections you want to use:");
-    let mut allowed_types = String::new();
-    std::io::stdin().read_line(&mut allowed_types)?;
-    let allowed_types: usize = allowed_types.trim().parse()?;
+    // Ask the user for the number of distinct section types
+    let mut input = String::new();
+    print!("Enter the number of distinct section types: ");
+    io::stdout().flush()?;
+    io::stdin().read_line(&mut input)?;
+    let distinct_section_types: usize = input.trim().parse()?;
 
-    let best_solution = genetic_algorithm(&project_data, &sections, allowed_types);
+    let best_solution = genetic_algorithm(&project_data, &sections, distinct_section_types);
 
     // Save the best solution
     let mut wtr = WriterBuilder::new().from_path("best_solution.csv")?;
