@@ -19,7 +19,7 @@ struct SectionData {
 }
 
 const POPULATION_SIZE: usize = 300;
-const NUM_GENERATIONS: usize = 2000;
+const NUM_GENERATIONS: usize = 1000;
 const MUTATION_RATE: f64 = 0.02;
 const TOURNAMENT_SIZE: usize = 5;
 const ELITISM_RATE: usize = 5; // Elitism rate, retain top 5 solutions
