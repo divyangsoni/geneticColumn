@@ -1,109 +1,91 @@
 Column Label,Maximum Axial Load,Length
-Build2_CS1,86.01,16
-Build2_CS2,74.94,16
-Build2_CS3,56.32,16
-Build2_CS4,26.86,16
-Build2_CS5,106.46,16
-Build2_CS6,57.31,16
-Build2_CS7,44.16,16
-Build2_CS8,67.12,16
-Build2_CS9,14.15,16
-Build2_CS10,11.22,16
-Build2_CS11,53.79,16
-Build2_CS12,53.05,16
-Build2_CS13,71,16
-Build2_CS14,34.07,16
-Build2_CS15,8.24,16
-Build2_CS16,25.37,16
-Build2_CS17,30.24,16
-Build2_CS18,29.28,16
-Build2_CS19,68.17,19
-Build2_CS20,64.7,19
-Build2_CS21,35.44,19
-Build2_CS22,55.46,19
-Build2_CS23,52.66,19
-Build2_CS24,46.27,19
-Build2_CS25,61.42,19
-Build1_CS1,42.73,19
-Build1_CS2,50.43,19
-Build1_CS4,57.83,19
-Build1_CS5,70.5,19
-Build1_CS6,69.72,19
-Build1_CS7,19.13,19
-Build1_CS8,50.37,19
-Build1_CS9,33.85,19
-Build1_CS10,44.39,19
-Build1_CS11,56.71,19
-Build1_CS12,61.13,19
-Build1_CS14,76.83,19
-Build1_CS15,75.59,19
-Build1_CS16,78.04,19
-Build1_CS17,61.95,19
-Build1_CS18,61.01,19
-Build1_CS19,76.13,19
-Build4_CS1,76.18,19
-Build4_CS2,45.91,19
-Build4_CS3,53.4,19
-Build4_CS4,80,19
-Build4_CS5,131.52,19
-Build4_CS6,131.67,19
-Build4_CS8,83.02,19
-Build4_CS9,96.02,19
-Build4_CS10,138.13,19
-Build4_CS11,142.01,19
-Build4_CS12,145.21,19
-Build4_CS13,152.28,19
-Build4_CS14,89.79,19
-Build4_CS15,26.2,16
-Build4_CS16,76.33,16
-Build4_CS17,77.67,16
-Build4_CS18,106.77,16
-Build4_CS19,27.44,16
-Build4_CS19_1,74.76,16
-Build4_CS20,92.49,16
-Build4_CS21,77.14,16
-Build4_CS22,88,16
-Build4_CS23,80.58,16
-Build4_CS24,48.2,16
-Build4_CS25,117.23,16
-Build4_CS26,3.19,16
-Build4_CS27,24.72,16
-Build4_CS28,74.65,16
-Build4_CS29,69.06,16
-Build4_CS31,79.22,16
-Build3_CS1,94.05,19
-Build3_CS2,88.38,19
-Build3_CS3,101.48,19
-Build3_CS4,135.97,19
-Build3_CS5,90.1,19
-Build3_CS6,68.57,19
-Build3_CS7,123.11,19
-Build3_CS8,145.88,19
-Build3_CS9,65.4,19
-Build3_CS10,76.62,19
-Build3_CS11,81.1,19
-Build3_CS12,99.91,19
-Build3_CS13,84.98,19
-Build3_CS14,44.74,19
-Build3_CS15,88.18,19
-Build3_CS16,74.57,19
-Build3_CS17,10.7,19
-Build3_CS18,71.37,19
-Build3_CS19,129.61,19
-Build3_CS20,120.12,19
-Build3_CS21,89.01,19
-Build3_CS22,77.4,19
-Build3_CS23,146.9,19
-Build3_CS24,137.63,19
-Build3_CS25,93.62,19
-Build3_CS26,75.02,19
-Build3_CS27,159.29,19
-Build3_CS28,48.23,19
-Build3_CS29,131.31,19
-Build3_CS30,71.58,19
-Build3_CS31,145.73,19
-Build3_CS32,80.2,19
-Build3_CS33,133.42,19
-Build3_CS20_1,127.52,19
-Build3_CS21_1,75.66,19
-Build3_CS25_1,67.26,19
+Column 100(Kip),45.28,17
+Column 101(Kip),12.37,17
+Column 102(Kip),6.51,17
+Column 103(Kip),3.8,17
+Column 104(Kip),5.5,17
+Column 105(Kip),41.57,17
+Column 106(Kip),6.32,17
+Column 107(Kip),4.34,17
+Column 108(Kip),30.35,17
+Column 109(Kip),4.06,17
+Column 110(Kip),22.43,17
+Column 111(Kip),11.84,17
+Column 112(Kip),12.5,17
+Column 113(Kip),88.29,17
+Column 114(Kip),77.02,17
+Column 115(Kip),24.71,17
+Column 116(Kip),88.36,17
+Column 117(Kip),15.65,17
+Column 118(Kip),34.17,17
+Column 119(Kip),45.91,17
+Column 120(Kip),69.79,17
+Column 121(Kip),22.92,17
+Column 122(Kip),5.42,17
+Column 123(Kip),6.48,17
+Column 124(Kip),49.45,17
+Column 125(Kip),-3.41,17
+Column 126(Kip),63.04,17
+Column 127(Kip),52.22,17
+Column 128(Kip),2.56,17
+Column 129(Kip),14.8,17
+Column 130(Kip),13.57,17
+Column 131(Kip),6.97,17
+Column 132(Kip),-1.55,17
+Column 133(Kip),-9,17
+Column 134(Kip),-36.92,17
+Column 135(Kip),-50.25,17
+Column 136(Kip),-49.57,17
+Column 138(Kip),50.64,17
+Column 139(Kip),20.51,17
+Column 140(Kip),76.19,17
+Column 141(Kip),176.1,17
+Column 142(Kip),95.38,17
+Column 143(Kip),111.91,17
+Column 144(Kip),174.57,17
+Column 145(Kip),118.45,17
+Column 146(Kip),102.08,17
+Column 147(Kip),216.5,17
+Column 148(Kip),140.11,17
+Column 149(Kip),135.58,17
+Column 151(Kip),141.19,17
+Column 152(Kip),102.98,17
+Column 153(Kip),85.33,17
+Column 154(Kip),119.81,17
+Column 156(Kip),172.27,17
+Column 157(Kip),225.37,17
+Column 158(Kip),288.32,17
+Column 159(Kip),177.31,17
+Column 162(Kip),266.89,17
+Column 165(Kip),208.28,17
+Column 166(Kip),47.3,17
+Column 167(Kip),73.8,17
+Column 175(Kip),86.54,17
+Column 176(Kip),74.32,17
+Column 177(Kip),129.5,17
+Column 178(Kip),130.16,17
+Column 180(Kip),103.52,17
+Column 181(Kip),113.74,17
+Column 182(Kip),221.35,17
+Column 183(Kip),131.02,17
+Column 184(Kip),109.71,17
+Column 185(Kip),137.78,17
+Column 186(Kip),269.74,17
+Column 187(Kip),198.85,17
+Column 188(Kip),96.73,17
+Column 189(Kip),84.01,17
+Column 190(Kip),182.71,17
+Column 191(Kip),202.09,17
+Column 192(Kip),148.88,17
+Column 193(Kip),51.89,17
+Column 200(Kip),67.47,17
+Column 204(Kip),126.2,17
+Column 206(Kip),443.17,17
+Column 207(Kip),166.37,17
+Column 208(Kip),682.92,17
+Column 209(Kip),805.95,17
+Column 210(Kip),400.08,17
+Column 211(Kip),32.04,17
+Column 212(Kip),71.18,17
+Column 213(Kip),35.63,17
+Column 214(Kip),118.51,17
