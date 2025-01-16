@@ -1,7 +1,7 @@
 use csv::{ReaderBuilder, WriterBuilder};
 use rand::{prelude::*, seq::SliceRandom};
-use std::error::Error;
 use std::collections::HashSet;
+use std::error::Error;
 use std::io::{self, Write};
 
 #[derive(Debug, Clone)]
@@ -19,11 +19,12 @@ struct SectionData {
 }
 
 const POPULATION_SIZE: usize = 300;
-const NUM_GENERATIONS: usize = 2000;
-const MUTATION_RATE: f64 = 0.02;
-const TOURNAMENT_SIZE: usize = 5;
-const ELITISM_RATE: usize = 5; // Elitism rate, retain top 5 solutions
+const NUM_GENERATIONS: usize = 5000;
+const MUTATION_RATE: f64 = 0.05; // Slightly increased for better exploration
+const TOURNAMENT_SIZE: usize = 10; // Larger size for stricter selection
+const ELITISM_RATE: usize = 5; // Retain top solutions
 const CAPACITY_PENALTY_FACTOR: f64 = 1000.0;
+const DIVERSITY_PENALTY_FACTOR: f64 = 5000.0;
 
 fn load_project_data(filename: &str) -> Result<Vec<ColumnData>, Box<dyn Error>> {
     let mut rdr = ReaderBuilder::new().has_headers(true).from_path(filename)?;
@@ -64,28 +65,13 @@ fn load_section_data(filename: &str) -> Result<Vec<SectionData>, Box<dyn Error>>
 fn initialize_population(
     project_data: &[ColumnData],
     sections: &[SectionData],
+    distinct_section_types: usize,
 ) -> Vec<Vec<usize>> {
     let mut population = Vec::new();
     let mut rng = thread_rng();
 
-    for column in project_data {
-        let valid_sections: Vec<usize> = sections
-            .iter()
-            .enumerate()
-            .filter(|(_, section)| column.max_axial_load <= section.axial_capacity)
-            .map(|(index, _)| index)
-            .collect();
-
-        if valid_sections.is_empty() {
-            println!(
-                "No valid sections found for column {} with max axial load {:.2}",
-                column.label, column.max_axial_load
-            );
-            panic!("No valid sections found for at least one column");
-        }
-    }
-
-    for _ in 0..POPULATION_SIZE {
+    while population.len() < POPULATION_SIZE {
+        let mut used_sections = HashSet::new();
         let chromosome = project_data
             .iter()
             .map(|column| {
@@ -96,15 +82,19 @@ fn initialize_population(
                     .map(|(index, _)| index)
                     .collect();
 
-                *valid_sections.choose(&mut rng).expect("No valid sections found")
+                let section_idx = *valid_sections.choose(&mut rng).expect("No valid sections found");
+                used_sections.insert(section_idx);
+                section_idx
             })
-            .collect();
+            .collect::<Vec<_>>();
 
-        population.push(chromosome);
+        if used_sections.len() >= distinct_section_types {
+            population.push(chromosome);
+        }
     }
+
     population
 }
-
 
 fn fitness(
     chromosome: &[usize],
@@ -132,7 +122,7 @@ fn fitness(
     // Penalize if the chromosome doesn't meet the required number of distinct section types
     let distinct_count = used_types.len();
     if distinct_count != distinct_section_types {
-        penalty += (distinct_section_types as f64 - distinct_count as f64).abs() * 1000.0;
+        penalty += (distinct_section_types as f64 - distinct_count as f64).powi(2) * DIVERSITY_PENALTY_FACTOR;
     }
 
     total_weight + penalty
@@ -179,7 +169,7 @@ fn genetic_algorithm(
     distinct_section_types: usize,
 ) -> Vec<usize> {
     let section_indices: Vec<usize> = (0..sections.len()).collect();
-    let mut population = initialize_population(project_data, &sections);
+    let mut population = initialize_population(project_data, sections, distinct_section_types);
     let mut best_solution = population[0].clone();
     let mut best_fitness = f64::INFINITY;
 
@@ -204,7 +194,7 @@ fn genetic_algorithm(
 
         // Elitism: Keep the top ELITISM_RATE solutions
         for _ in 0..ELITISM_RATE {
-            new_population.push(population[fitness_values.iter().position(|&x| x == best_fitness).unwrap()].clone());
+            new_population.push(best_solution.clone());
         }
 
         // Fill the remaining population
@@ -222,9 +212,12 @@ fn genetic_algorithm(
 
         population = new_population;
 
-        // Print generation number and fitness/weight of the best solution
-        let total_weight = fitness(&best_solution, project_data, sections, distinct_section_types);
-        println!("Generation {}: Best Fitness (Weight) = {:.2}", generation, total_weight);
+        // Print generation number and fitness of the best solution
+        let distinct_count = best_solution.iter().collect::<HashSet<_>>().len();
+        println!(
+            "Generation {}: Best Fitness = {:.2}, Distinct Sections = {}",
+            generation, best_fitness, distinct_count
+        );
     }
 
     best_solution
